@@ -36,16 +36,34 @@ const userNotificationRoutes = require('./api/user_notifications');
 const pushRoutes = require('./routes/pushRoutes');
 
 const app = express();
+
+// --- CORS Configuration ---
+// Parse CORS_ORIGINS from environment variable (comma-separated)
+const allowedOrigins = process.env.CORS_ORIGINS 
+    ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+    : ['http://localhost:3000']; // Default for development
+
+console.log('[CORS] Allowed origins:', allowedOrigins);
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+};
+
 // --- Handler untuk semua preflight OPTIONS agar CORS preflight selalu direspon ---
-app.options('*', cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.options('*', cors(corsOptions));
+
 // --- CORS PALING ATAS ---
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.use(cors(corsOptions));
 // --- 2. Middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
