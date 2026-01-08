@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "installCommand": "cd be-pinjam-rev-main && npm install --legacy-peer-deps",
   "builds": [
     {
       "src": "be-pinjam-rev-main/server.js",
